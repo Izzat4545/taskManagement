@@ -103,6 +103,7 @@ app.delete('/tasks/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Update task by id
 app.put('/tasks/:id', async (req: Request, res: Response) => {
   try {
     const task = await Task.findById(req.params.id);

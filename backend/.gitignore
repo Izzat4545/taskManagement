@@ -1,15 +1,15 @@
 # Node.js dependencies
-backend/node_modules
+node_modules
 
 # Compiled JavaScript files
-backend/dist
-backend/build
+dist
+build
 
 # TypeScript output
-backend/*.tsbuildinfo
+*.tsbuildinfo
 
 # Environment variables
-backend/.env
+.env
 
 # Logs
 *.log
