@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import { ITask } from './types/task'
+import cors from 'cors';
 
 // MongoDB connection
 const mongoURI = 'mongodb://localhost:27017/taskmanager';
@@ -22,8 +23,7 @@ const Task = mongoose.model<ITask>('Task', TaskSchema);
 // Created Express app
 const app = express();
 app.use(bodyParser.json());
-
-
+app.use(cors());
 // MY API ROUTES
 
 // It will get all tasks
