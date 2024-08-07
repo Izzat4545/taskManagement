@@ -11,7 +11,6 @@ const TaskList: React.FC = () => {
 
   useEffect(() => {
     setTaskList(tasks);
-    console.log(tasks);
   }, [tasks]);
 
   // This could be a problem
