@@ -8,9 +8,6 @@ build
 # TypeScript output
 *.tsbuildinfo
 
-# Environment variables
-.env
-
 # Logs
 *.log
 

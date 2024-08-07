@@ -3,9 +3,11 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import { ITask } from "./types/task";
 import cors from "cors";
+import dotenv from "dotenv";
 
-// MongoDB connection
-const mongoURI = "mongodb://localhost:27017/taskmanager";
+dotenv.config();
+// MongoDB connection please make sure to add your own databse
+const mongoURI = process.env.MONGO_URI!;
 mongoose
   .connect(mongoURI)
   .then(() => console.log("MongoDB connected..."))
