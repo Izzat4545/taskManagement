@@ -28,7 +28,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   };
 
   return (
-    <div className="card w-full bg-base-100 shadow-xl m-2">
+    <div className="card border w-full bg-base-100 shadow-xl m-2">
       <div className="flex flex-col justify-between p-5">
         {isEditing ? (
           <div className="flex items-center">
@@ -60,7 +60,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 className="btn btn-primary btn-sm md:btn-md"
                 onClick={handleToggleCompleted}
               >
-                {task.completed ? "Mark Incomplete" : "Mark Complete"}
+                {task.completed ? "Incomplete" : "Complete"}
               </button>
               <button
                 className="btn btn-secondary btn-sm md:btn-md"

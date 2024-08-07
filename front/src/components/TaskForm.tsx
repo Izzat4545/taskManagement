@@ -37,7 +37,7 @@ const TaskForm: React.FC = () => {
   return (
     <div>
       <form onSubmit={handleSubmit} className="form-control mb-4">
-        <div className="input-group flex gap-3 justify-between">
+        <div className="input-group flex flex-col sm:flex-row gap-3 justify-between">
           <input
             type="text"
             value={title}
@@ -60,7 +60,7 @@ const TaskForm: React.FC = () => {
         />
 
         <select
-          className="select select-primary w-full max-w-xs"
+          className="select select-primary w-full"
           value={completedFilter}
           onChange={handleFilterChange}
         >
