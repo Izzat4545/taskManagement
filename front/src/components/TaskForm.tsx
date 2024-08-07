@@ -24,6 +24,7 @@ const TaskForm: React.FC = () => {
         title: searchQuery,
         completed:
           completedFilter === "true" ||
+          // if the value undefined it will display all tasks
           (completedFilter === undefined && undefined),
       })
     );
@@ -31,6 +32,7 @@ const TaskForm: React.FC = () => {
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
+    // if it is all then make the value undeined
     setCompletedFilter(value === "all" ? undefined : value);
   };
 

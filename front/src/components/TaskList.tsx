@@ -5,6 +5,7 @@ import { reorderTasks } from "../redux/tasksSlice";
 
 const TaskList: React.FC = () => {
   const { tasks, status } = useAppSelector((state) => state.tasks);
+  // saving the tasks in taskList to make it dynamic when I change the order
   const [taskList, setTaskList] = useState(tasks);
   const dispatch = useAppDispatch();
 
@@ -26,6 +27,7 @@ const TaskList: React.FC = () => {
     e: React.DragEvent<HTMLDivElement>,
     dropIndex: number
   ) => {
+    // ONCE THE TASK HAS BEEN DROPPED IT WILL SYNCRONIZE THE SERVER WITH THE CURRENT ORDER
     const draggedIndex = e.dataTransfer.getData("draggedIndex");
     if (draggedIndex === null) return;
 
@@ -50,6 +52,7 @@ const TaskList: React.FC = () => {
             <p>Completed Tasks: {completedTasks}</p>
             <p>Not Completed Tasks: {notCompletedTasks}</p>
           </div>
+          {/* just a simple drag and drop */}
           {taskList.map((task, index) => (
             <div
               key={task._id}

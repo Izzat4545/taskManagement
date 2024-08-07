@@ -1,3 +1,5 @@
+// I know it is not a good practice to keep everything in one file but for this simple project it works
+
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
