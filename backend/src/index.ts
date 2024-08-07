@@ -134,6 +134,8 @@ app.put("/tasks/:id", async (req: Request, res: Response) => {
 app.put("/tasks", async (req: Request, res: Response) => {
   try {
     const { tasks } = req.body;
+    const { title, completed } = req.query;
+
     if (!Array.isArray(tasks)) {
       return res.status(400).json({ message: "Invalid tasks data" });
     }
@@ -146,9 +148,36 @@ app.put("/tasks", async (req: Request, res: Response) => {
           .json({ message: `Invalid ObjectId: ${task._id}` });
       }
     }
-    // Perform database operations
-    await Task.deleteMany({});
-    const result = await Task.insertMany(tasks);
+
+    // Create a filter object based on query parameters
+    const filter: any = {};
+    if (title) {
+      filter.title = new RegExp(title as string, "i");
+    }
+    if (completed !== undefined) {
+      filter.completed = completed === "true";
+    }
+
+    // Find tasks that match the filter criteria
+    const tasksToUpdate = await Task.find(filter).exec();
+    const tasksToUpdateIds = tasksToUpdate.map((task) =>
+      (task._id as mongoose.Types.ObjectId).toString()
+    );
+
+    // Ensure that only tasks matching the filter are updated
+    const tasksToSave = tasks.filter((task: { _id: string }) =>
+      tasksToUpdateIds.includes(task._id.toString())
+    );
+
+    if (tasksToSave.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No tasks found to update based on filter criteria" });
+    }
+
+    // Update tasks in the database
+    await Task.deleteMany({ _id: { $in: tasksToUpdateIds } });
+    const result = await Task.insertMany(tasksToSave);
 
     res.status(200).json(result);
   } catch (err) {

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Task, TasksState } from "../types/tasks";
 
@@ -6,6 +6,8 @@ const initialState: TasksState = {
   tasks: [],
   status: "idle",
   error: null,
+  searchQuery: "",
+  completedFilter: undefined,
 };
 
 const baseUrl = "http://localhost:5000";
@@ -52,8 +54,16 @@ export const deleteTask = createAsyncThunk(
 
 export const reorderTasks = createAsyncThunk(
   "tasks/reorderTasks",
-  async (newTaskList: Task[]) => {
-    const response = await axios.put(`${baseUrl}/tasks`, {
+  async (newTaskList: Task[], { getState }) => {
+    const state = getState() as { tasks: TasksState };
+    const { searchQuery, completedFilter } = state.tasks;
+
+    const query = new URLSearchParams();
+    if (searchQuery) query.append("title", searchQuery);
+    if (completedFilter !== undefined && completedFilter !== null)
+      query.append("completed", String(completedFilter));
+
+    const response = await axios.put(`${baseUrl}/tasks?${query.toString()}`, {
       tasks: newTaskList,
     });
     return response.data;
@@ -63,7 +73,14 @@ export const reorderTasks = createAsyncThunk(
 const tasksSlice = createSlice({
   name: "tasks",
   initialState,
-  reducers: {},
+  reducers: {
+    setSearchQuery(state, action: PayloadAction<string>) {
+      state.searchQuery = action.payload;
+    },
+    setCompletedFilter(state, action: PayloadAction<boolean | undefined>) {
+      state.completedFilter = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -96,5 +113,7 @@ const tasksSlice = createSlice({
       });
   },
 });
+
+export const { setSearchQuery, setCompletedFilter } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

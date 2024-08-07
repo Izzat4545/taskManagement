@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch } from "../redux/hooks";
-import { fetchTasks, addTask } from "../redux/tasksSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import {
+  fetchTasks,
+  addTask,
+  setSearchQuery,
+  setCompletedFilter,
+} from "../redux/tasksSlice";
 
 const TaskForm: React.FC = () => {
   const [title, setTitle] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [completedFilter, setCompletedFilter] = useState<string | undefined>(
-    undefined
+  const searchQuery = useAppSelector((state) => state.tasks.searchQuery);
+  const completedFilter = useAppSelector(
+    (state) => state.tasks.completedFilter
   );
   const dispatch = useAppDispatch();
 
@@ -22,18 +27,15 @@ const TaskForm: React.FC = () => {
     dispatch(
       fetchTasks({
         title: searchQuery,
-        completed:
-          completedFilter === "true" ||
-          // if the value undefined it will display all tasks
-          (completedFilter === undefined && undefined),
+        completed: completedFilter,
       })
     );
   }, [dispatch, searchQuery, completedFilter]);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    // if it is all then make the value undeined
-    setCompletedFilter(value === "all" ? undefined : value);
+    const completedValue = value === "all" ? undefined : value === "true";
+    dispatch(setCompletedFilter(completedValue));
   };
 
   return (
@@ -47,7 +49,7 @@ const TaskForm: React.FC = () => {
             placeholder="New Task"
             className="input input-bordered w-full"
           />
-          <button type="submit" className="btn  btn-primary">
+          <button type="submit" className="btn btn-primary">
             Add Task
           </button>
         </div>
@@ -57,13 +59,14 @@ const TaskForm: React.FC = () => {
           type="text"
           placeholder="Search tasks by name"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => dispatch(setSearchQuery(e.target.value))}
           className="input input-bordered w-full mb-4"
         />
-
         <select
           className="select select-primary w-full"
-          value={completedFilter}
+          value={
+            completedFilter === undefined ? "all" : completedFilter.toString()
+          }
           onChange={handleFilterChange}
         >
           <option value="all">All Tasks</option>

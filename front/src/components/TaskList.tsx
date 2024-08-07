@@ -11,7 +11,10 @@ const TaskList: React.FC = () => {
 
   useEffect(() => {
     setTaskList(tasks);
+    console.log(tasks);
   }, [tasks]);
+
+  // This could be a problem
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
   const notCompletedTasks = totalTasks - completedTasks;
