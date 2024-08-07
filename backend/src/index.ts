@@ -1,15 +1,19 @@
-import express, { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import { ITask } from './types/task'
-import cors from 'cors';
+import express, { Request, Response } from "express";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import { ITask } from "./types/task";
+import cors from "cors";
 
 // MongoDB connection
-const mongoURI = 'mongodb://localhost:27017/taskmanager';
-mongoose.connect(mongoURI)
-  .then(() => console.log('MongoDB connected...'))
+const mongoURI = "mongodb://localhost:27017/taskmanager";
+mongoose
+  .connect(mongoURI)
+  .then(() => console.log("MongoDB connected..."))
   .catch((err: unknown) => {
-    console.error('Failed to connect to MongoDB', err instanceof Error ? err.message : 'Unknown error');
+    console.error(
+      "Failed to connect to MongoDB",
+      err instanceof Error ? err.message : "Unknown error"
+    );
   });
 
 //Task model
@@ -18,7 +22,7 @@ const TaskSchema = new mongoose.Schema<ITask>({
   completed: { type: Boolean, default: false },
 });
 
-const Task = mongoose.model<ITask>('Task', TaskSchema);
+const Task = mongoose.model<ITask>("Task", TaskSchema);
 
 // Created Express app
 const app = express();
@@ -27,51 +31,51 @@ app.use(cors());
 // MY API ROUTES
 
 // It will get all tasks
-app.get('/tasks', async (req: Request, res: Response) => {
+app.get("/tasks", async (req: Request, res: Response) => {
   try {
     const { title, completed } = req.query;
 
     const filter: any = {};
     if (title) {
-      filter.title = new RegExp(title as string, 'i');
+      filter.title = new RegExp(title as string, "i");
     }
     if (completed !== undefined) {
-      filter.completed = completed === 'true';
+      filter.completed = completed === "true";
     }
 
     const tasks = await Task.find(filter);
     res.json(tasks);
   } catch (err) {
     res.status(500).json({
-      message: 'Error fetching tasks',
-      error: err instanceof Error ? err.message : 'Unknown error occurred',
+      message: "Error fetching tasks",
+      error: err instanceof Error ? err.message : "Unknown error occurred",
     });
   }
 });
 
 // it will get specific task
-app.get('/tasks/:id', async (req: Request, res: Response) => {
+app.get("/tasks/:id", async (req: Request, res: Response) => {
   try {
     const task = await Task.findById(req.params.id);
     if (task) {
       res.json(task);
     } else {
-      res.status(404).json({ message: 'Task not found' });
+      res.status(404).json({ message: "Task not found" });
     }
   } catch (err) {
     res.status(500).json({
-      message: 'Error fetching task',
-      error: err instanceof Error ? err.message : 'Unknown error occurred',
+      message: "Error fetching task",
+      error: err instanceof Error ? err.message : "Unknown error occurred",
     });
   }
 });
 
 // To post a task title is REQUIRED
-app.post('/tasks', async (req: Request, res: Response) => {
+app.post("/tasks", async (req: Request, res: Response) => {
   const { title } = req.body;
 
   if (!title) {
-    return res.status(400).json({ message: 'Title is required' });
+    return res.status(400).json({ message: "Title is required" });
   }
 
   try {
@@ -80,31 +84,31 @@ app.post('/tasks', async (req: Request, res: Response) => {
     res.status(201).json(newTask);
   } catch (err) {
     res.status(500).json({
-      message: 'Error creating task',
-      error: err instanceof Error ? err.message : 'Unknown error occurred',
+      message: "Error creating task",
+      error: err instanceof Error ? err.message : "Unknown error occurred",
     });
   }
 });
 
 // TO DELETE TASK
-app.delete('/tasks/:id', async (req: Request, res: Response) => {
+app.delete("/tasks/:id", async (req: Request, res: Response) => {
   try {
     const result = await Task.findByIdAndDelete(req.params.id);
     if (result) {
-      res.json({ message: 'Task deleted' });
+      res.json({ message: "Task deleted" });
     } else {
-      res.status(404).json({ message: 'Task not found' });
+      res.status(404).json({ message: "Task not found" });
     }
   } catch (err) {
     res.status(500).json({
-      message: 'Error deleting task',
-      error: err instanceof Error ? err.message : 'Unknown error occurred',
+      message: "Error deleting task",
+      error: err instanceof Error ? err.message : "Unknown error occurred",
     });
   }
 });
 
 // Update task by id
-app.put('/tasks/:id', async (req: Request, res: Response) => {
+app.put("/tasks/:id", async (req: Request, res: Response) => {
   try {
     const task = await Task.findById(req.params.id);
     if (task) {
@@ -112,12 +116,41 @@ app.put('/tasks/:id', async (req: Request, res: Response) => {
       await task.save();
       res.json(task);
     } else {
-      res.status(404).json({ message: 'Task not found' });
+      res.status(404).json({ message: "Task not found" });
     }
   } catch (err) {
     res.status(500).json({
-      message: 'Error updating task',
-      error: err instanceof Error ? err.message : 'Unknown error occurred',
+      message: "Error updating task",
+      error: err instanceof Error ? err.message : "Unknown error occurred",
+    });
+  }
+});
+
+//To update the order of tasks
+app.put("/tasks", async (req: Request, res: Response) => {
+  try {
+    const { tasks } = req.body;
+    if (!Array.isArray(tasks)) {
+      return res.status(400).json({ message: "Invalid tasks data" });
+    }
+
+    // Validate each task's _id
+    for (const task of tasks) {
+      if (!mongoose.Types.ObjectId.isValid(task._id)) {
+        return res
+          .status(400)
+          .json({ message: `Invalid ObjectId: ${task._id}` });
+      }
+    }
+    // Perform database operations
+    await Task.deleteMany({});
+    const result = await Task.insertMany(tasks);
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error updating tasks order",
+      error: err instanceof Error ? err.message : "Unknown error occurred",
     });
   }
 });

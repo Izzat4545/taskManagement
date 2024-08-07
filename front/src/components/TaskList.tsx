@@ -1,15 +1,41 @@
-import React from "react";
-import { useAppSelector } from "../redux/hooks";
+import React, { useEffect, useState } from "react";
+import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import Task from "./Task";
+import { reorderTasks } from "../redux/tasksSlice";
 
 const TaskList: React.FC = () => {
   const { tasks, status } = useAppSelector((state) => state.tasks);
+  const [taskList, setTaskList] = useState(tasks);
+  const dispatch = useAppDispatch();
 
-  // Calculating task counts
+  useEffect(() => {
+    setTaskList(tasks);
+  }, [tasks]);
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
   const notCompletedTasks = totalTasks - completedTasks;
 
+  const handleDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    e.dataTransfer.setData("draggedIndex", index.toString());
+  };
+
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    dropIndex: number
+  ) => {
+    const draggedIndex = e.dataTransfer.getData("draggedIndex");
+    if (draggedIndex === null) return;
+
+    const newTaskList = [...taskList];
+    const [draggedTask] = newTaskList.splice(parseInt(draggedIndex), 1);
+    newTaskList.splice(dropIndex, 0, draggedTask);
+    setTaskList(newTaskList);
+
+    dispatch(reorderTasks(newTaskList));
+  };
   return (
     <div>
       {/* Will check the avilabilty of the tasks */}
@@ -24,8 +50,16 @@ const TaskList: React.FC = () => {
             <p>Completed Tasks: {completedTasks}</p>
             <p>Not Completed Tasks: {notCompletedTasks}</p>
           </div>
-          {tasks.map((task) => (
-            <Task key={task._id} task={task} />
+          {taskList.map((task, index) => (
+            <div
+              key={task._id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => handleDrop(e, index)}
+            >
+              <Task task={task} />
+            </div>
           ))}
         </>
       )}
