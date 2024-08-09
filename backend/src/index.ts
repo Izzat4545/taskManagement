@@ -152,9 +152,11 @@ app.put("/tasks", async (req: Request, res: Response) => {
     // Create a filter object based on query parameters
     const filter: any = {};
     if (title) {
-      filter.title = new RegExp(title as string, "i");
+      // If title is provided, adds a regex-based search on the title field
+      filter.title = new RegExp(title as string, "i"); //not case sensetive
     }
     if (completed !== undefined) {
+      // If completed is provided, converts it to a boolean and adds it to the filter.
       filter.completed = completed === "true";
     }
 
