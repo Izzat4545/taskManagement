@@ -17,9 +17,12 @@ const TaskForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title) {
-      dispatch(addTask({ title, completed: false }));
+    const trimmedTitle = title.trim();
+    if (trimmedTitle) {
+      dispatch(addTask({ title: trimmedTitle, completed: false }));
       setTitle("");
+    } else {
+      console.log("Task title cannot be empty or only spaces.");
     }
   };
 
