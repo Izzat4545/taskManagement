@@ -52,7 +52,10 @@ const TaskForm: React.FC = () => {
             placeholder="New Task"
             className="input input-bordered w-full"
           />
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className={`btn ${title.trim() ? "btn-primary" : "btn-disabled"}`}
+          >
             Add Task
           </button>
         </div>

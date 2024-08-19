@@ -15,16 +15,16 @@ export const getTasksHandler = async (req: Request, res: Response) => {
     const { title, completed } = req.query;
     const filter: FilterQuery<ITask> = {};
 
-    // Check if title is a string
-    if (title && typeof title !== "string") {
-      return res.status(400).json({ message: "Invalid title query parameter" });
+    // Apply title filter if provided
+    if (title && typeof title === "string") {
+      filter.title = { $regex: title, $options: "i" }; // Case-insensitive search
     }
 
-    // Check if completed is either "true" or "false"
-    if (completed && completed !== "true" && completed !== "false") {
-      return res
-        .status(400)
-        .json({ message: "Invalid completed query parameter" });
+    // Apply completed filter if provided
+    if (completed === "true") {
+      filter.completed = true;
+    } else if (completed === "false") {
+      filter.completed = false;
     }
 
     const tasks = await getTasks(filter);
