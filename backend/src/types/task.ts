@@ -1,6 +1,6 @@
-import { Document } from 'mongoose';
+import { Document } from "mongoose";
 
 export interface ITask extends Document {
-  title: string;
-  completed: boolean;
+  title?: RegExp;
+  completed?: boolean;
 }
