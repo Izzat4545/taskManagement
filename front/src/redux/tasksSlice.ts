@@ -10,7 +10,7 @@ const initialState: TasksState = {
   completedFilter: undefined,
 };
 
-const baseUrl = "http://localhost:5000";
+const baseUrl = import.meta.env.VITE_BASEURL;
 // Async actions
 export const fetchTasks = createAsyncThunk(
   "tasks/fetchTasks",
